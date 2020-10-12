@@ -874,3 +874,94 @@ pub fn is_ugly(num: i32) -> bool {
     }
     num == 1
 }
+
+// Definition for a binary tree node.
+// #[derive(Debug, PartialEq, Eq)]
+// pub struct TreeNode {
+//   pub val: i32,
+//   pub left: Option<Rc<RefCell<TreeNode>>>,
+//   pub right: Option<Rc<RefCell<TreeNode>>>,
+// }
+//
+// impl TreeNode {
+//   #[inline]
+//   pub fn new(val: i32) -> Self {
+//     TreeNode {
+//       val,
+//       left: None,
+//       right: None
+//     }
+//   }
+// }
+// Find Mode in Binary Search Tree
+pub fn find_mode(root: Option<Rc<RefCell<TreeNode>>>) -> Vec<i32> {
+    match root {
+        None => vec![],
+        Some(root) => {
+            let mut counter = std::collections::HashMap::<i32, i32>::new();
+            fn find(n: Option<Rc<RefCell<TreeNode>>>, m: &mut std::collections::HashMap<i32, i32>) {
+                match n {
+                    Some(n) => {
+                        (*m.entry(n.borrow().val).or_insert(0)) += 1;
+                        find(n.borrow().left.clone(), m);
+                        find(n.borrow().right.clone(), m);
+                    }
+                    None => (),
+                }
+            }
+            find(Some(root), &mut counter);
+            let mut list = counter.iter().collect::<Vec<(&i32, &i32)>>();
+            list.sort_unstable_by(|a, b| b.1.cmp(a.1));
+
+            let (mut res, mut prev) = (vec![*list[0].0], list[0].1);
+            for i in 1..list.len() {
+                if prev != list[i].1 {
+                    break;
+                }
+                res.push(*(list[i].0));
+            }
+            res
+        }
+    }
+}
+
+// Base 7
+pub fn convert_to_base7(num: i32) -> String {
+    let mut num = num;
+    match num {
+        0 => "0".to_string(),
+        _ => {
+            let sign = if num < 0 {
+                num *= -1;
+                "-".to_string()
+            } else {
+                "".to_string()
+            };
+
+            let mut s = String::new();
+            while num > 0 {
+                s = (num % 7).to_string() + &s;
+                num /= 7;
+            }
+            sign + &s
+        }
+    }
+}
+
+// Relative Ranks
+pub fn find_relative_ranks(nums: Vec<i32>) -> Vec<String> {
+    let (mut ns, mut m) = (nums.clone(), std::collections::HashMap::new());
+    ns.sort_by_key(|&n| -n);
+    ns.into_iter().enumerate().for_each(|(i, n)| {
+        m.insert(n, i);
+    });
+
+    nums.iter()
+        .map(|n| match m[n] {
+            0 => "Gold Medal".to_string(),
+            1 => "Silver Medal".to_string(),
+            2 => "Bronze Medal".to_string(),
+            _ => (m[n] + 1).to_string(),
+        })
+        .collect()
+}
