@@ -965,3 +965,158 @@ pub fn find_relative_ranks(nums: Vec<i32>) -> Vec<String> {
         })
         .collect()
 }
+
+// Definition for a binary tree node.
+// #[derive(Debug, PartialEq, Eq)]
+// pub struct TreeNode {
+//   pub val: i32,
+//   pub left: Option<Rc<RefCell<TreeNode>>>,
+//   pub right: Option<Rc<RefCell<TreeNode>>>,
+// }
+//
+// impl TreeNode {
+//   #[inline]
+//   pub fn new(val: i32) -> Self {
+//     TreeNode {
+//       val,
+//       left: None,
+//       right: None
+//     }
+//   }
+// }
+// Find Bottom Left Tree Value
+use std::cell::RefCell;
+use std::rc::Rc;
+impl Solution {
+    pub fn find_bottom_left_value(root: Option<Rc<RefCell<TreeNode>>>) -> i32 {
+        fn find(root: Option<Rc<RefCell<TreeNode>>>, height: i32, max: &mut i32, res: &mut i32) {
+            match root {
+                Some(root) => {
+                    if height > *max {
+                        *max = height;
+                        *res = root.borrow().val;
+                    }
+                    find(root.borrow().left.clone(), height + 1, max, res);
+                    find(root.borrow().right.clone(), height + 1, max, res);
+                }
+                _ => (),
+            }
+        }
+        let (max, res) = (&mut 0, &mut 0);
+        find(root.clone(), 1, max, res);
+        *res
+    }
+}
+
+// Definition for a binary tree node.
+// #[derive(Debug, PartialEq, Eq)]
+// pub struct TreeNode {
+//   pub val: i32,
+//   pub left: Option<Rc<RefCell<TreeNode>>>,
+//   pub right: Option<Rc<RefCell<TreeNode>>>,
+// }
+//
+// impl TreeNode {
+//   #[inline]
+//   pub fn new(val: i32) -> Self {
+//     TreeNode {
+//       val,
+//       left: None,
+//       right: None
+//     }
+//   }
+// }
+// Most Frequent Subtree Sum
+use std::cell::RefCell;
+use std::rc::Rc;
+impl Solution {
+    pub fn find_frequent_tree_sum(root: Option<Rc<RefCell<TreeNode>>>) -> Vec<i32> {
+        match root {
+            None => vec![],
+            Some(root) => {
+                let mut m = std::collections::HashMap::new();
+                fn count(
+                    root: Option<Rc<RefCell<TreeNode>>>,
+                    m: &mut std::collections::HashMap<i32, i32>,
+                ) -> i32 {
+                    match root {
+                        Some(root) => {
+                            let left = count(root.borrow().left.clone(), m);
+                            let right = count(root.borrow().right.clone(), m);
+                            let total = left + right + root.borrow().val;
+                            (*m.entry(total).or_insert(0)) += 1;
+                            total
+                        }
+                        None => 0,
+                    }
+                }
+                count(Some(root), &mut m);
+                let mut list = m.iter().collect::<Vec<(&i32, &i32)>>();
+                list.sort_unstable_by(|a, b| b.1.cmp(a.1));
+
+                let (mut res, mut prev) = (vec![*list[0].0], list[0].1);
+                for i in 1..list.len() {
+                    if prev != list[i].1 {
+                        break;
+                    }
+                    res.push(*list[i].0);
+                }
+                res
+
+                /*
+                or
+
+                m.iter().fold(vec![], |mut acc, (&k, &v)| {
+                    if v == max {
+                        acc.push(v);
+                    }
+                    acc
+                })
+                */
+            }
+        }
+    }
+}
+
+// Definition for a binary tree node.
+// #[derive(Debug, PartialEq, Eq)]
+// pub struct TreeNode {
+//   pub val: i32,
+//   pub left: Option<Rc<RefCell<TreeNode>>>,
+//   pub right: Option<Rc<RefCell<TreeNode>>>,
+// }
+//
+// impl TreeNode {
+//   #[inline]
+//   pub fn new(val: i32) -> Self {
+//     TreeNode {
+//       val,
+//       left: None,
+//       right: None
+//     }
+//   }
+// }
+// Find Largest Value in Each Tree Row
+use std::cell::RefCell;
+use std::rc::Rc;
+impl Solution {
+    pub fn largest_values(root: Option<Rc<RefCell<TreeNode>>>) -> Vec<i32> {
+        fn collect(root: Option<Rc<RefCell<TreeNode>>>, level: usize, ret: &mut Vec<i32>) {
+            match root {
+                None => (),
+                Some(root) => {
+                    if ret.len() < level {
+                        ret.push(root.borrow().val);
+                    } else {
+                        ret[level - 1] = ret[level - 1].max(root.borrow().val);
+                    }
+                    collect(root.borrow().left.clone(), level + 1, ret);
+                    collect(root.borrow().right.clone(), level + 1, ret);
+                }
+            }
+        }
+        let mut ret = vec![];
+        collect(root, 1, &mut ret);
+        ret
+    }
+}
