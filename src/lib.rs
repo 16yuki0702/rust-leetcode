@@ -1120,3 +1120,36 @@ impl Solution {
         ret
     }
 }
+
+// Remove Element
+impl Solution {
+    pub fn remove_element(nums: &mut Vec<i32>, val: i32) -> i32 {
+        nums.retain(|&v| v != val);
+        nums.len() as i32
+    }
+}
+
+// Find First and Last Position of Element in Sorted Array
+impl Solution {
+    pub fn search_range(nums: Vec<i32>, target: i32) -> Vec<i32> {
+        match nums.len() {
+            0 => vec![-1, -1],
+            _ => {
+                let (mut start, mut end) = (-1, -1);
+                for i in 0..nums.len() {
+                    if nums[i] != target {
+                        continue;
+                    }
+
+                    if start == -1 {
+                        start = i as i32;
+                        end = i as i32;
+                    } else {
+                        end = i as i32;
+                    }
+                }
+                vec![start, end]
+            }
+        }
+    }
+}
