@@ -1130,6 +1130,7 @@ impl Solution {
 }
 
 // Find First and Last Position of Element in Sorted Array
+// linear search
 impl Solution {
     pub fn search_range(nums: Vec<i32>, target: i32) -> Vec<i32> {
         match nums.len() {
@@ -1151,5 +1152,47 @@ impl Solution {
                 vec![start, end]
             }
         }
+    }
+}
+//binary search
+impl Solution {
+    pub fn search_range(nums: Vec<i32>, target: i32) -> Vec<i32> {
+        match nums.len() {
+            0 => vec![-1, -1],
+            _ => {
+                let (mut left, mut right) = (0, nums.len() - 1);
+                while left <= right && right < nums.len() {
+                    let mid = (left + right) / 2;
+                    if nums[mid] > target {
+                        right = mid.checked_sub(1).unwrap_or(nums.len());
+                    } else if nums[mid] < target {
+                        left = mid + 1;
+                    } else {
+                        if nums[left] < target {
+                            left += 1;
+                        }
+                        if nums[right] > target {
+                            right -= 1;
+                        }
+                        if nums[left] == nums[right] {
+                            return vec![left as i32, right as i32];
+                        }
+                    }
+                }
+                vec![-1, -1]
+            }
+        }
+    }
+}
+
+// Search Insert Position
+impl Solution {
+    pub fn search_insert(nums: Vec<i32>, target: i32) -> i32 {
+        for (i, v) in nums.iter().enumerate() {
+            if target <= *v {
+                return i as i32;
+            }
+        }
+        nums.len() as i32
     }
 }
