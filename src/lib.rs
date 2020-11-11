@@ -1196,3 +1196,114 @@ impl Solution {
         nums.len() as i32
     }
 }
+
+// Generate Parentheses
+impl Solution {
+    pub fn generate_parenthesis(n: i32) -> Vec<String> {
+        fn back_track(s: String, open: i32, close: i32) -> Vec<String> {
+            let mut res = vec![];
+            if open == 0 && close == 0 {
+                return vec![s];
+            }
+            if open > 0 {
+                res.append(&mut back_track(s.clone() + "(", open - 1, close + 1));
+            }
+            if close > 0 {
+                res.append(&mut back_track(s.clone() + ")", open, close - 1));
+            }
+            res
+        }
+        back_track("".to_string(), n, 0)
+    }
+}
+
+//
+// Definition for singly-linked list.
+// #[derive(PartialEq, Eq, Clone, Debug)]
+// pub struct ListNode {
+//   pub val: i32,
+//   pub next: Option<Box<ListNode>>
+// }
+//
+// impl ListNode {
+//   #[inline]
+//   fn new(val: i32) -> Self {
+//     ListNode {
+//       next: None,
+//       val
+//     }
+//   }
+// }
+// Merge Two Sorted Lists
+impl Solution {
+    pub fn merge_two_lists(
+        l1: Option<Box<ListNode>>,
+        l2: Option<Box<ListNode>>,
+    ) -> Option<Box<ListNode>> {
+        match (l1, l2) {
+            (None, None) => None,
+            (Some(n), None) | (None, Some(n)) => Some(n),
+            (Some(l1), Some(l2)) => {
+                if l1.val >= l2.val {
+                    Some(Box::new(ListNode {
+                        val: l2.val,
+                        next: Solution::merge_two_lists(Some(l1), l2.next),
+                    }))
+                } else {
+                    Some(Box::new(ListNode {
+                        val: l1.val,
+                        next: Solution::merge_two_lists(l1.next, Some(l2)),
+                    }))
+                }
+            }
+        }
+    }
+}
+
+// Definition for singly-linked list.
+// #[derive(PartialEq, Eq, Clone, Debug)]
+// pub struct ListNode {
+//   pub val: i32,
+//   pub next: Option<Box<ListNode>>
+// }
+//
+// impl ListNode {
+//   #[inline]
+//   fn new(val: i32) -> Self {
+//     ListNode {
+//       next: None,
+//       val
+//     }
+//   }
+// }
+// Swap Nodes in Pairs
+impl Solution {
+    pub fn swap_pairs(head: Option<Box<ListNode>>) -> Option<Box<ListNode>> {
+        head.and_then(|mut n| match n.next {
+            None => Some(n),
+            Some(mut nn) => {
+                n.next = Solution::swap_pairs(nn.next);
+                nn.next = Some(n);
+                Some(nn)
+            }
+        })
+    }
+}
+
+// Pow(x, n)
+impl Solution {
+    pub fn my_pow(x: f64, n: i32) -> f64 {
+        fn pow(x: f64, res: f64, n: i64) -> f64 {
+            match n {
+                0 => res,
+                n if n & 1 == 1 => pow(x * x, res * x, n >> 1),
+                _ => pow(x * x, res, n >> 1),
+            }
+        }
+        match n {
+            0 => 1.0,
+            n if n < 0 => pow(1.0 / x, 1.0, (n as i64).abs()),
+            _ => pow(x, 1.0, n as i64),
+        }
+    }
+}
