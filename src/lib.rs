@@ -1307,3 +1307,109 @@ impl Solution {
         }
     }
 }
+
+// Maximum Subarray
+impl Solution {
+    pub fn max_sub_array(nums: Vec<i32>) -> i32 {
+        let (mut cur, mut max) = (nums[0], nums[0]);
+        for i in 1..nums.len() {
+            cur = match cur < 0 {
+                true => nums[i],
+                _ => cur + nums[i],
+            };
+            max = max.max(cur);
+        }
+        max
+    }
+}
+
+// Remove Duplicates from Sorted Array II
+impl Solution {
+    pub fn remove_duplicates(nums: &mut Vec<i32>) -> i32 {
+        match nums.len() {
+            0 | 1 => nums.len() as i32,
+            _ => {
+                let mut ptr = 2;
+                for i in ptr..nums.len() {
+                    if nums[ptr - 2] != nums[i] {
+                        nums[ptr] = nums[i];
+                        ptr += 1;
+                    }
+                }
+                ptr as i32
+            }
+        }
+    }
+}
+/*
+// Below is a very cool solution
+// https://leetcode.com/problems/remove-duplicates-from-sorted-array-ii/discuss/742918/Rust-cheapest-and-best
+impl Solution {
+    pub fn remove_duplicates(nums: &mut Vec<i32>) -> i32 {
+        match nums.len() {
+            0 | 1 => nums.len() as i32,
+            _ => (2..nums.len()).fold(2i32, |mut k, i| {
+                if nums[(k - 2) as usize] != nums[i] {
+                    nums[k as usize] = nums[i];
+                    k += 1;
+                }
+                k
+            }),
+        }
+    }
+}
+*/
+
+// Definition for a binary tree node.
+// #[derive(Debug, PartialEq, Eq)]
+// pub struct TreeNode {
+//   pub val: i32,
+//   pub left: Option<Rc<RefCell<TreeNode>>>,
+//   pub right: Option<Rc<RefCell<TreeNode>>>,
+// }
+//
+// impl TreeNode {
+//   #[inline]
+//   pub fn new(val: i32) -> Self {
+//     TreeNode {
+//       val,
+//       left: None,
+//       right: None
+//     }
+//   }
+// }
+// Recover Binary Search Tree
+use std::cell::RefCell;
+use std::rc::Rc;
+impl Solution {
+    pub fn recover_tree(root: &mut Option<Rc<RefCell<TreeNode>>>) {
+        fn dfs(
+            node: &Option<Rc<RefCell<TreeNode>>>,
+            first: &mut Option<Rc<RefCell<TreeNode>>>,
+            second: &mut Option<Rc<RefCell<TreeNode>>>,
+            prev: &mut Option<Rc<RefCell<TreeNode>>>,
+        ) {
+            if let Some(n) = node {
+                dfs(&n.borrow().left, first, second, prev);
+                if let Some(prev) = prev {
+                    if prev.borrow().val >= n.borrow().val {
+                        if first.is_none() {
+                            *first = Some(prev.clone());
+                        }
+                        if first.is_some() {
+                            *second = Some(n.clone());
+                        }
+                    }
+                }
+                *prev = Some(n.clone());
+                dfs(&n.borrow().right, first, second, prev);
+            }
+        }
+        let (mut first, mut second, mut prev) = (None, None, None);
+        dfs(root, &mut first, &mut second, &mut prev);
+        std::mem::swap(
+            &mut first.unwrap().borrow_mut().val,
+            &mut second.unwrap().borrow_mut().val,
+        );
+    }
+}
