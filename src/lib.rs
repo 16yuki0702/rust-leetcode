@@ -1453,3 +1453,62 @@ impl Solution {
         dfs(root) != -1
     }
 }
+
+// Single Number
+impl Solution {
+    pub fn single_number(nums: Vec<i32>) -> i32 {
+        nums.iter().fold(0, |acc, x| acc ^ x)
+    }
+}
+
+// Single Number II
+impl Solution {
+    pub fn single_number(nums: Vec<i32>) -> i32 {
+        fn q_sort(nums: &mut [i32]) {
+            if nums.len() <= 1 {
+                return;
+            }
+
+            let mid = nums.len() / 2;
+            let (mut left, mut right) = (0, nums.len() - 1);
+            nums.swap(mid, right);
+
+            for i in 0..nums.len() {
+                if nums[i] > nums[right] {
+                    nums.swap(left, i);
+                    left += 1;
+                }
+            }
+
+            nums.swap(left, right);
+            q_sort(&mut nums[0..left]);
+            q_sort(&mut nums[left + 1..=right]);
+        }
+
+        let mut nums = nums;
+        q_sort(&mut nums);
+
+        let (mut res, mut i) = (0, 0);
+        while i < nums.len() {
+            if i + 1 == nums.len() || nums[i] != nums[i + 1] {
+                return nums[i];
+            }
+            i += 3;
+        }
+        res
+    }
+}
+
+// N-Repeated Element in Size 2N Array
+impl Solution {
+    pub fn repeated_n_times(a: Vec<i32>) -> i32 {
+        let mut m = std::collections::HashSet::new();
+        for x in a {
+            if m.contains(&x) {
+                return x;
+            }
+            m.insert(x);
+        }
+        unreachable!()
+    }
+}
