@@ -1512,3 +1512,164 @@ impl Solution {
         unreachable!()
     }
 }
+
+// Definition for a binary tree node.
+// #[derive(Debug, PartialEq, Eq)]
+// pub struct TreeNode {
+//   pub val: i32,
+//   pub left: Option<Rc<RefCell<TreeNode>>>,
+//   pub right: Option<Rc<RefCell<TreeNode>>>,
+// }
+//
+// impl TreeNode {
+//   #[inline]
+//   pub fn new(val: i32) -> Self {
+//     TreeNode {
+//       val,
+//       left: None,
+//       right: None
+//     }
+//   }
+// }
+// Univalued Binary Tree
+use std::cell::RefCell;
+use std::rc::Rc;
+impl Solution {
+    pub fn is_unival_tree(root: Option<Rc<RefCell<TreeNode>>>) -> bool {
+        fn is_unival(n: Option<Rc<RefCell<TreeNode>>>, v: i32) -> bool {
+            match n {
+                None => true,
+                Some(n) => {
+                    n.borrow().val == v
+                        && is_unival(n.borrow().left.clone(), v)
+                        && is_unival(n.borrow().right.clone(), v)
+                }
+            }
+        }
+        is_unival(root.clone(), root.unwrap().borrow().val)
+    }
+}
+
+// Reverse Only Letters
+impl Solution {
+    pub fn reverse_only_letters(s: String) -> String {
+        let mut s: Vec<char> = s.chars().collect();
+        let (mut start, mut end) = (0, s.len() - 1);
+        loop {
+            while start < s.len() {
+                if s[start].is_alphabetic() {
+                    break;
+                }
+                start += 1;
+            }
+            // checking if underflow
+            while end != std::usize::MAX {
+                if s[end].is_alphabetic() {
+                    break;
+                }
+                end -= 1;
+            }
+            if start >= s.len() || end == std::usize::MAX || start >= end {
+                break;
+            }
+            s.swap(start, end);
+            start += 1;
+            end -= 1;
+        }
+        s.iter().collect::<String>()
+    }
+}
+
+// Definition for a binary tree node.
+// #[derive(Debug, PartialEq, Eq)]
+// pub struct TreeNode {
+//   pub val: i32,
+//   pub left: Option<Rc<RefCell<TreeNode>>>,
+//   pub right: Option<Rc<RefCell<TreeNode>>>,
+// }
+//
+// impl TreeNode {
+//   #[inline]
+//   pub fn new(val: i32) -> Self {
+//     TreeNode {
+//       val,
+//       left: None,
+//       right: None
+//     }
+//   }
+// }
+// Leaf-Similar Trees
+use std::cell::RefCell;
+use std::rc::Rc;
+impl Solution {
+    pub fn leaf_similar(
+        root1: Option<Rc<RefCell<TreeNode>>>,
+        root2: Option<Rc<RefCell<TreeNode>>>,
+    ) -> bool {
+        fn collect_leaves(n: Option<Rc<RefCell<TreeNode>>>) -> Vec<i32> {
+            match n {
+                None => vec![],
+                Some(n) => {
+                    if n.borrow().left.is_none() && n.borrow().right.is_none() {
+                        return vec![n.borrow().val];
+                    }
+                    let mut list = collect_leaves(n.borrow().left.clone());
+                    list.extend(collect_leaves(n.borrow().right.clone()));
+                    list
+                }
+            }
+        }
+        collect_leaves(root1) == collect_leaves(root2)
+    }
+}
+
+// Definition for a binary tree node.
+// #[derive(Debug, PartialEq, Eq)]
+// pub struct TreeNode {
+//   pub val: i32,
+//   pub left: Option<Rc<RefCell<TreeNode>>>,
+//   pub right: Option<Rc<RefCell<TreeNode>>>,
+// }
+//
+// impl TreeNode {
+//   #[inline]
+//   pub fn new(val: i32) -> Self {
+//     TreeNode {
+//       val,
+//       left: None,
+//       right: None
+//     }
+//   }
+// }
+// Maximum Level Sum of a Binary Tree
+use std::cell::RefCell;
+use std::rc::Rc;
+impl Solution {
+    pub fn max_level_sum(root: Option<Rc<RefCell<TreeNode>>>) -> i32 {
+        fn collect_levels(n: Option<Rc<RefCell<TreeNode>>>, level: usize, list: &mut Vec<i32>) {
+            match n {
+                None => (),
+                Some(n) => {
+                    if level == list.len() + 1 {
+                        list.push(n.borrow().val);
+                    } else {
+                        list[level - 1] += n.borrow().val;
+                    }
+                    collect_levels(n.borrow().left.clone(), level + 1, list);
+                    collect_levels(n.borrow().right.clone(), level + 1, list);
+                }
+            }
+        }
+        let mut list = vec![];
+        collect_levels(root, 1, &mut list);
+        let (mut max_index, mut max_value) = (0, std::i32::MIN);
+
+        for i in 0..list.len() {
+            if list[i] > max_value {
+                max_value = list[i];
+                max_index = i + 1;
+            }
+        }
+        max_index as i32
+    }
+}
