@@ -1673,3 +1673,106 @@ impl Solution {
         max_index as i32
     }
 }
+
+// Definition for a binary tree node.
+// #[derive(Debug, PartialEq, Eq)]
+// pub struct TreeNode {
+//   pub val: i32,
+//   pub left: Option<Rc<RefCell<TreeNode>>>,
+//   pub right: Option<Rc<RefCell<TreeNode>>>,
+// }
+//
+// impl TreeNode {
+//   #[inline]
+//   pub fn new(val: i32) -> Self {
+//     TreeNode {
+//       val,
+//       left: None,
+//       right: None
+//     }
+//   }
+// }
+// Validate Binary Search Tree
+use std::cell::RefCell;
+use std::rc::Rc;
+impl Solution {
+    pub fn is_valid_bst(root: Option<Rc<RefCell<TreeNode>>>) -> bool {
+        fn validate(
+            n: Option<Rc<RefCell<TreeNode>>>,
+            min: Option<Rc<RefCell<TreeNode>>>,
+            max: Option<Rc<RefCell<TreeNode>>>,
+        ) -> bool {
+            match n {
+                None => true,
+                Some(n) => {
+                    if let Some(max) = max.clone() {
+                        if max.borrow().val <= n.borrow().val {
+                            return false;
+                        }
+                    }
+                    if let Some(min) = min.clone() {
+                        if min.borrow().val >= n.borrow().val {
+                            return false;
+                        }
+                    }
+                    validate(n.borrow().left.clone(), min, Some(n.clone()))
+                        && validate(n.borrow().right.clone(), Some(n.clone()), max)
+                }
+            }
+        }
+        validate(root, None, None)
+    }
+}
+
+// LRU Cache
+use std::collections::{HashMap, VecDeque};
+
+struct LRUCache {
+    q: VecDeque<i32>,
+    m: HashMap<i32, i32>,
+    c: usize,
+}
+
+/**
+ * `&self` means the method takes an immutable reference.
+ * If you need a mutable reference, change it to `&mut self` instead.
+ */
+impl LRUCache {
+    fn new(capacity: i32) -> Self {
+        Self {
+            q: VecDeque::with_capacity(capacity as usize),
+            m: HashMap::new(),
+            c: capacity as usize,
+        }
+    }
+
+    fn get(&mut self, key: i32) -> i32 {
+        match self.m.get(&key) {
+            Some(v) => {
+                self.q
+                    .remove(self.q.iter().position(|&x| x == key).unwrap());
+                self.q.push_front(key);
+                *v
+            }
+            None => -1,
+        }
+    }
+
+    fn put(&mut self, key: i32, value: i32) {
+        match self.m.get(&key) {
+            Some(_) => {
+                self.q
+                    .remove(self.q.iter().position(|&x| x == key).unwrap());
+                self.q.push_front(key);
+                self.m.insert(key, value);
+            }
+            None => {
+                if self.m.len() == self.c {
+                    self.m.remove(&self.q.pop_back().unwrap());
+                }
+                self.m.insert(key, value);
+                self.q.push_front(key);
+            }
+        }
+    }
+}
