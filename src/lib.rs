@@ -1776,3 +1776,134 @@ impl LRUCache {
         }
     }
 }
+
+// Number of 1 Bits
+impl Solution {
+    pub fn hammingWeight(n: u32) -> i32 {
+        let (mut n, mut count) = (n, 0);
+        while n > 0 {
+            if n & 1 == 1 {
+                count += 1;
+            }
+            n >>= 1;
+        }
+        count
+    }
+}
+
+// Reverse Bits
+impl Solution {
+    pub fn reverse_bits(x: u32) -> u32 {
+        let (mut res, mut x) = (0u32, x);
+        for _ in 0..32 {
+            res = (res << 1) | (x & 1);
+            x >>= 1;
+        }
+        res
+    }
+}
+
+// Search in Rotated Sorted Array
+impl Solution {
+    pub fn search(nums: Vec<i32>, target: i32) -> i32 {
+        let (mut left, mut right) = (0, nums.len() - 1);
+        while left <= right && right != std::usize::MAX {
+            if nums[left] == target {
+                return left as i32;
+            } else if nums[right] == target {
+                return right as i32;
+            }
+
+            let mid = (right + left) / 2;
+            if nums[mid] == target {
+                return mid as i32;
+            }
+
+            if nums[left] > nums[right] {
+                left += 1;
+                right -= 1;
+            } else {
+                if nums[mid] > target {
+                    right = mid - 1;
+                    left += 1;
+                } else {
+                    left = mid + 1;
+                    right -= 1;
+                }
+            }
+        }
+        -1
+    }
+}
+
+// Longest Palindromic Substring
+impl Solution {
+    pub fn longest_palindrome(s: String) -> String {
+        let (mut s, mut max) = (s.chars().collect::<Vec<char>>(), vec![]);
+        fn find_max(s: &Vec<char>, max: Vec<char>, i: usize, j: usize) -> Vec<char> {
+            let (mut i, mut j) = (i, j);
+            let mut sub: &[char] = &[];
+            while i != std::usize::MAX && j < s.len() && s[i] == s[j] {
+                sub = &s[i..j + 1];
+                i -= 1;
+                j += 1;
+            }
+            if sub.len() > max.len() {
+                return sub.to_vec();
+            }
+            max.to_vec()
+        }
+        for i in 0..s.len() {
+            max = find_max(&s, max, i, i);
+            max = find_max(&s, max, i, i + 1);
+        }
+        max.into_iter().collect()
+    }
+}
+
+// String to Integer (atoi)
+impl Solution {
+    pub fn my_atoi(s: String) -> i32 {
+        let (mut start, mut res, mut sign) = (false, 0i64, 1);
+
+        for c in s.chars() {
+            match c {
+                '0'..='9' => {
+                    start = true;
+                    res = res * 10 + (c as i64 - '0' as i64);
+                    if res > std::i32::MAX as i64 {
+                        break;
+                    }
+                }
+                ' ' => {
+                    if start {
+                        break;
+                    }
+                }
+                '+' => {
+                    if start {
+                        break;
+                    }
+                    sign = 1;
+                    start = true;
+                }
+                '-' => {
+                    if start {
+                        break;
+                    }
+                    sign = -1;
+                    start = true;
+                }
+                _ => break,
+            }
+        }
+
+        res *= sign;
+        if res < std::i32::MIN as i64 {
+            return std::i32::MIN;
+        } else if res > std::i32::MAX as i64 {
+            return std::i32::MAX;
+        }
+        res as i32
+    }
+}
