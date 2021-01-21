@@ -96,6 +96,7 @@ pub fn find_target_sum_ways(nums: Vec<i32>, s: i32) -> i32 {
     *r
 }
 
+// Find All Duplicates in an Array
 pub fn find_duplicates(nums: Vec<i32>) -> Vec<i32> {
     let (mut m, mut res) = (std::collections::HashMap::new(), vec![]);
 
@@ -1905,5 +1906,97 @@ impl Solution {
             return std::i32::MAX;
         }
         res as i32
+    }
+}
+
+// Valid Parentheses
+impl Solution {
+    pub fn is_valid(s: String) -> bool {
+        let mut stack = vec![];
+        for c in s.chars() {
+            match c {
+                ')' => match stack.pop() {
+                    Some(c) => {
+                        if c != '(' {
+                            return false;
+                        }
+                    }
+                    None => return false,
+                },
+                ']' => match stack.pop() {
+                    Some(c) => {
+                        if c != '[' {
+                            return false;
+                        }
+                    }
+                    None => return false,
+                },
+                '}' => match stack.pop() {
+                    Some(c) => {
+                        if c != '{' {
+                            return false;
+                        }
+                    }
+                    None => return false,
+                },
+                _ => stack.push(c),
+            }
+        }
+        stack.is_empty()
+    }
+}
+
+// Integer to Roman
+impl Solution {
+    pub fn int_to_roman(num: i32) -> String {
+        let m = [1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1];
+        let s = [
+            "M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I",
+        ];
+
+        let (mut num, mut buf) = (num, vec![]);
+        for i in 0..13 {
+            let mut j = num / m[i];
+            num %= m[i];
+            while j > 0 {
+                buf.push(s[i]);
+                j -= 1;
+            }
+        }
+        buf.into_iter().collect()
+    }
+}
+
+// Roman to Integer
+impl Solution {
+    pub fn roman_to_int(s: String) -> i32 {
+        let t: std::collections::HashMap<char, i32> = [
+            ('I', 1),
+            ('V', 5),
+            ('X', 10),
+            ('L', 50),
+            ('C', 100),
+            ('D', 500),
+            ('M', 1000),
+        ]
+        .iter()
+        .cloned()
+        .collect();
+
+        let mut cs: Vec<char> = s.chars().collect();
+        let mut res = *t.get(&cs[cs.len() - 1]).unwrap();
+        let mut i = cs.len() - 2;
+
+        while i != std::usize::MAX {
+            let (current, next) = (t.get(&cs[i]).unwrap(), t.get(&cs[i + 1]).unwrap());
+            if current < next {
+                res -= *current;
+            } else {
+                res += *current;
+            }
+            i -= 1;
+        }
+
+        res
     }
 }
