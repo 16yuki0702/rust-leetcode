@@ -2040,3 +2040,345 @@ impl Solution {
         res
     }
 }
+
+// 3Sum Closest
+impl Solution {
+    pub fn three_sum_closest(nums: Vec<i32>, target: i32) -> i32 {
+        let mut nums = nums;
+        nums.sort();
+        let mut res: i64 = std::i32::MAX as i64;
+        let target: i64 = target as i64;
+
+        for i in 0..nums.len() - 2 {
+            let mut left = i + 1;
+            let mut right = nums.len() - 1;
+
+            while left < right {
+                let sum: i64 = (nums[i] + nums[left] + nums[right]).into();
+                if sum == target {
+                    return target as i32;
+                } else if sum > target {
+                    right -= 1;
+                } else if sum < target {
+                    left += 1;
+                }
+                if (target - sum).abs() < (target - res).abs() {
+                    res = sum;
+                }
+            }
+        }
+        res as i32
+    }
+}
+
+// Letter Combinations of a Phone Number
+impl Solution {
+    pub fn letter_combinations(digits: String) -> Vec<String> {
+        let mut res: Vec<String> = vec![];
+
+        if digits.len() == 0 {
+            return res;
+        }
+
+        let m: std::collections::HashMap<char, &str> = [
+            ('1', ""),
+            ('2', "abc"),
+            ('3', "def"),
+            ('4', "ghi"),
+            ('5', "jkl"),
+            ('6', "mno"),
+            ('7', "pqrs"),
+            ('8', "tuv"),
+            ('9', "wxyz"),
+        ]
+        .iter()
+        .cloned()
+        .collect();
+
+        for c in digits.chars() {
+            let letters = m.get(&c).unwrap();
+            let mut tmp: Vec<String> = vec![];
+
+            for cc in letters.chars() {
+                if res.len() == 0 {
+                    tmp.push(cc.to_string());
+                } else {
+                    for r in res.iter() {
+                        tmp.push(r.to_owned() + &cc.to_string());
+                    }
+                }
+            }
+
+            res = tmp;
+        }
+        res
+    }
+}
+
+// ZigZag Conversion
+impl Solution {
+    pub fn convert(s: String, num_rows: i32) -> String {
+        let mut buffer: Vec<Vec<char>> = vec![];
+        for i in 0..num_rows {
+            buffer.push(vec![]);
+        }
+
+        let chars: Vec<char> = s.chars().collect();
+        let mut column = 0usize;
+        while column < s.len() {
+            let mut row = 0usize;
+            while row < num_rows as usize && column < s.len() {
+                buffer[row].push(chars[column]);
+                row += 1;
+                column += 1;
+            }
+
+            row = (num_rows as usize).checked_sub(2).unwrap_or(0);
+            while row >= 1 && column < s.len() {
+                buffer[row].push(chars[column]);
+                row -= 1;
+                column += 1;
+            }
+        }
+
+        let mut res = "".to_string();
+        for i in 0..num_rows {
+            res = res + &(&buffer[i as usize]).iter().collect::<String>();
+        }
+        res
+    }
+}
+
+// Palindrome Number
+impl Solution {
+    pub fn is_palindrome(x: i32) -> bool {
+        if x < 0 || (x % 10 == 0 && x != 0) {
+            return false;
+        }
+
+        let (mut x, mut rev) = (x, 0);
+        while x > rev {
+            rev = rev * 10 + x % 10;
+            x /= 10;
+        }
+        x == rev || x == rev / 10
+    }
+}
+
+// 4Sum
+impl Solution {
+    pub fn four_sum(nums: Vec<i32>, target: i32) -> Vec<Vec<i32>> {
+        let mut res: Vec<Vec<i32>> = vec![];
+        if nums.len() < 4 {
+            return res;
+        }
+        let mut nums = nums;
+        nums.sort();
+
+        for i in 0..nums.len() - 1 {
+            if i > 0 && nums[i] == nums[i - 1] {
+                continue;
+            }
+
+            for j in i + 1..nums.len() - 2 {
+                if j > i + 1 && nums[j] == nums[j - 1] {
+                    continue;
+                }
+
+                let (mut left, mut right) = (j + 1, nums.len() - 1);
+                while left < right {
+                    let tmp = nums[i] + nums[j] + nums[left] + nums[right];
+                    if tmp == target {
+                        res.push([nums[i], nums[j], nums[left], nums[right]].to_vec());
+                        left += 1;
+                        right -= 1;
+
+                        while left < right && nums[left] == nums[left - 1] {
+                            left += 1;
+                        }
+                        while left < right && nums[right] == nums[right + 1] {
+                            right -= 1;
+                        }
+                    } else if tmp < target {
+                        left += 1;
+                    } else if tmp > target {
+                        right -= 1;
+                    }
+                }
+            }
+        }
+        res
+    }
+}
+
+// Regular Expression Matching
+impl Solution {
+    pub fn is_match(s: String, p: String) -> bool {
+        fn is_match_str(s: &str, p: &str) -> bool {
+            let (s_len, p_len) = (s.len(), p.len());
+            if p_len == 0 {
+                return s_len == 0;
+            }
+
+            let m = { s_len > 0 && (s.as_bytes()[0] == p.as_bytes()[0] || p.as_bytes()[0] == 46) };
+
+            if p_len >= 2 && p.as_bytes()[1] == 42 {
+                return is_match_str(s, &p[2..]) || (m && is_match_str(&s[1..], p));
+            }
+
+            m && is_match_str(&s[1..], &p[1..])
+        }
+        is_match_str(&s, &p)
+    }
+}
+
+// Container With Most Water
+impl Solution {
+    pub fn max_area(height: Vec<i32>) -> i32 {
+        let (mut res, mut left, mut right) = (0, 0, height.len() - 1);
+
+        while left < right {
+            let x = (right - left) as i32;
+            let mut y = 0;
+
+            if height[left] < height[right] {
+                y = height[left];
+                left += 1;
+            } else {
+                y = height[right];
+                right -= 1;
+            }
+
+            res = res.max(x * y);
+        }
+        res
+    }
+}
+
+// Definition for singly-linked list.
+// #[derive(PartialEq, Eq, Clone, Debug)]
+// pub struct ListNode {
+//   pub val: i32,
+//   pub next: Option<Box<ListNode>>
+// }
+//
+// impl ListNode {
+//   #[inline]
+//   fn new(val: i32) -> Self {
+//     ListNode {
+//       next: None,
+//       val
+//     }
+//   }
+// }
+// Remove Nth Node From End of List
+impl Solution {
+    pub fn remove_nth_from_end(head: Option<Box<ListNode>>, n: i32) -> Option<Box<ListNode>> {
+        let mut dummy = Box::new(ListNode {
+            val: -1,
+            next: head,
+        });
+
+        let mut fast = dummy.clone();
+        for _ in 0..n {
+            fast = fast.next.unwrap();
+        }
+
+        let mut slow = dummy.as_mut();
+        while let Some(n) = fast.next {
+            fast = n;
+            slow = slow.next.as_mut().unwrap();
+        }
+
+        slow.next = slow.next.as_mut().unwrap().next.clone();
+        dummy.next
+    }
+}
+
+// Definition for singly-linked list.
+// #[derive(PartialEq, Eq, Clone, Debug)]
+// pub struct ListNode {
+//   pub val: i32,
+//   pub next: Option<Box<ListNode>>
+// }
+//
+// impl ListNode {
+//   #[inline]
+//   fn new(val: i32) -> Self {
+//     ListNode {
+//       next: None,
+//       val
+//     }
+//   }
+// }
+// Merge k Sorted Lists
+impl Solution {
+    pub fn merge_k_lists(lists: Vec<Option<Box<ListNode>>>) -> Option<Box<ListNode>> {
+        use std::collections::BinaryHeap;
+        fn build(
+            mut head: Option<Box<ListNode>>,
+            mut heap: BinaryHeap<i32>,
+        ) -> Option<Box<ListNode>> {
+            while !heap.is_empty() {
+                head = Some(Box::new(ListNode {
+                    val: heap.pop().unwrap(),
+                    next: head,
+                }));
+            }
+            head
+        }
+        build(
+            None,
+            BinaryHeap::from(lists.iter().fold(vec![], |mut acc, mut cur| {
+                while cur.is_some() {
+                    acc.push(cur.as_ref().unwrap().val);
+                    cur = &cur.as_ref().unwrap().next;
+                }
+                acc
+            })),
+        )
+    }
+}
+
+// Definition for singly-linked list.
+// #[derive(PartialEq, Eq, Clone, Debug)]
+// pub struct ListNode {
+//   pub val: i32,
+//   pub next: Option<Box<ListNode>>
+// }
+//
+// impl ListNode {
+//   #[inline]
+//   fn new(val: i32) -> Self {
+//     ListNode {
+//       next: None,
+//       val
+//     }
+//   }
+// }
+// Reverse Nodes in k-Group
+impl Solution {
+    pub fn reverse_k_group(head: Option<Box<ListNode>>, k: i32) -> Option<Box<ListNode>> {
+        fn add(head: Option<Box<ListNode>>, tail: Option<Box<ListNode>>) -> Option<Box<ListNode>> {
+            let mut head = head;
+            let mut tail = tail;
+
+            while let Some(mut new_tail) = head.take() {
+                head = new_tail.next.take();
+                new_tail.next = tail.take();
+                tail = Some(new_tail);
+            }
+            tail
+        }
+        let mut head = head;
+        let mut tail = &mut head;
+        for _ in 0..k {
+            match tail.as_mut() {
+                None => return head,
+                Some(tail_ref) => tail = &mut tail_ref.next,
+            }
+        }
+        let tail = tail.take();
+        add(head, Solution::reverse_k_group(tail, k))
+    }
+}
