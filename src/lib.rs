@@ -2382,3 +2382,181 @@ impl Solution {
         add(head, Solution::reverse_k_group(tail, k))
     }
 }
+
+// Implement strStr()
+impl Solution {
+    pub fn str_str(haystack: String, needle: String) -> i32 {
+        if needle.len() < 1 {
+            return 0;
+        }
+
+        if haystack.len() < needle.len() {
+            return -1;
+        }
+
+        let hay: Vec<char> = haystack.chars().collect();
+        let nee: Vec<char> = needle.chars().collect();
+
+        for i in 0..hay.len() {
+            if hay[i] != nee[0] {
+                continue;
+            }
+
+            let mut first = i as i32;
+            let mut j = i + 1;
+
+            for k in 1..nee.len() {
+                if j >= hay.len() {
+                    return -1;
+                }
+
+                if hay[j] == nee[k] {
+                    j += 1;
+                } else {
+                    first = -1;
+                    break;
+                }
+            }
+            if first != -1 {
+                return first;
+            }
+        }
+        -1
+    }
+}
+
+// Next Permutation
+impl Solution {
+    pub fn next_permutation(nums: &mut Vec<i32>) {
+        match (1..nums.len()).rev().find(|&i| nums[i - 1] < nums[i]) {
+            Some(i) => {
+                let j = (i..nums.len())
+                    .rev()
+                    .find(|&j| nums[i - 1] < nums[j])
+                    .unwrap();
+                nums.swap(i - 1, j);
+                nums[i..].reverse();
+            }
+            None => nums.reverse(),
+        }
+    }
+}
+
+// Valid Sudoku
+impl Solution {
+    pub fn is_valid_sudoku(board: Vec<Vec<char>>) -> bool {
+        let mut rows = [[false; 9]; 9];
+        let mut cols = [[false; 9]; 9];
+        let mut blks = [[false; 9]; 9];
+
+        for i in 0..9 {
+            for j in 0..9 {
+                if board[i][j] == '.' {
+                    continue;
+                }
+
+                let v = board[i][j] as usize - '1' as usize;
+                let p = (i / 3 * 3) + (j / 3);
+
+                if rows[i][v] || cols[j][v] || blks[p][v] {
+                    return false;
+                }
+
+                rows[i][v] = true;
+                cols[j][v] = true;
+                blks[p][v] = true;
+            }
+        }
+        true
+    }
+}
+
+// Jump Game II
+impl Solution {
+    pub fn jump(nums: Vec<i32>) -> i32 {
+        if nums.len() == 0 {
+            return 1;
+        }
+
+        let (mut steps, mut current, mut end) = (0, 0, 0);
+        for i in 0..nums.len() - 1 {
+            let j = i as i32 + nums[i];
+            if current < j {
+                current = j;
+            }
+            if i == end {
+                steps += 1;
+                end = current as usize;
+            }
+        }
+        steps
+    }
+}
+
+// Rotate Image
+impl Solution {
+    pub fn rotate(matrix: &mut Vec<Vec<i32>>) {
+        matrix.reverse();
+        for i in 0..matrix.len() {
+            for j in i + 1..matrix.len() {
+                matrix[i][j] ^= matrix[j][i];
+                matrix[j][i] = matrix[i][j] ^ matrix[j][i];
+                matrix[i][j] ^= matrix[j][i];
+            }
+        }
+    }
+}
+
+// Combination Sum
+impl Solution {
+    pub fn combination_sum(candidates: Vec<i32>, target: i32) -> Vec<Vec<i32>> {
+        fn backtrack(sub: &[i32], candidates: &[i32], target: i32, res: &mut Vec<Vec<i32>>) {
+            let sum = sub.iter().sum::<i32>();
+            if sum == target {
+                res.push(sub.to_vec());
+                return;
+            } else if sum > target {
+                return;
+            }
+
+            for (i, v) in candidates.iter().enumerate() {
+                let mut s = sub.to_vec();
+                s.push(*v);
+                backtrack(&s, &candidates[i..], target, res);
+            }
+        }
+
+        let mut res: Vec<Vec<i32>> = vec![];
+        backtrack(&vec![], &candidates, target, &mut res);
+        res
+    }
+}
+
+// Combination Sum II
+impl Solution {
+    pub fn combination_sum2(candidates: Vec<i32>, target: i32) -> Vec<Vec<i32>> {
+        fn backtrack(sub: &[i32], candidates: &[i32], target: i32, res: &mut Vec<Vec<i32>>) {
+            let sum = sub.iter().sum::<i32>();
+            if sum == target {
+                res.push(sub.to_vec());
+                return;
+            } else if sum > target {
+                return;
+            }
+
+            for (i, v) in candidates.iter().enumerate() {
+                if i > 0 && candidates[i - 1] == *v {
+                    continue;
+                }
+                let mut s = sub.to_vec();
+                s.push(*v);
+                backtrack(&s, &candidates[i + 1..], target, res);
+            }
+        }
+        let mut candidates = candidates;
+        candidates.sort();
+        let mut res: Vec<Vec<i32>> = vec![];
+        backtrack(&vec![], &candidates, target, &mut res);
+        res
+    }
+}
