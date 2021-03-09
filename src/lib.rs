@@ -2560,3 +2560,100 @@ impl Solution {
         res
     }
 }
+
+// Trapping Rain Water
+impl Solution {
+    pub fn trap(height: Vec<i32>) -> i32 {
+        let (mut l, mut r) = (0, height.len() - 1);
+        let (mut lm, mut rm) = (0, 0);
+        let mut res = 0;
+
+        while l < r && r != std::usize::MAX {
+            if height[l] < height[r] {
+                if height[l] >= lm {
+                    lm = height[l];
+                } else {
+                    res += lm - height[l];
+                }
+                l += 1;
+            } else {
+                if height[r] >= rm {
+                    rm = height[r];
+                } else {
+                    res += rm - height[r];
+                }
+                r -= 1;
+            }
+        }
+        res
+    }
+}
+
+// Group Anagrams
+impl Solution {
+    pub fn group_anagrams(strs: Vec<String>) -> Vec<Vec<String>> {
+        use std::collections::HashMap;
+
+        let mut res: Vec<Vec<String>> = vec![];
+        let mut m: HashMap<[u8; 26], usize> = HashMap::new();
+        let mut i = 0;
+
+        for str in strs.iter() {
+            let mut s: [u8; 26] = [0; 26];
+            for c in str.chars() {
+                let ci = c as usize - 'a' as usize;
+                s[ci] += 1;
+            }
+            match m.get(&s) {
+                Some(j) => {
+                    res[*j].push(str.to_string());
+                }
+                None => {
+                    m.insert(s, i);
+                    if res.len() < i + 1 {
+                        res.push(vec![]);
+                    }
+                    res[i].push(str.to_string());
+                    i += 1;
+                }
+            }
+        }
+        res
+    }
+}
+// amazing example solution
+// https://leetcode.com/problems/group-anagrams/discuss/566237/Rust-Solution
+//
+// impl Solution {
+//     pub fn group_anagrams(strs: Vec<String>) -> Vec<Vec<String>> {
+//         let mut out = std::collections::HashMap::new();
+//         for v in strs {
+//             let mut k: Vec<u8> = v.bytes().collect();
+//             k.sort_unstable();
+//             out.entry(k).or_insert_with(|| vec![]).push(v)
+//         }
+//         out.into_iter().map(|(_, v)| v).collect()
+//     }
+// }
+//
+
+// Permutations
+impl Solution {
+    pub fn permute(nums: Vec<i32>) -> Vec<Vec<i32>> {
+        fn backtrack(nums: &[i32], sub: &[i32], res: &mut Vec<Vec<i32>>) {
+            if nums.len() == 0 {
+                res.push(sub.to_vec());
+                return;
+            }
+            for (i, v) in nums.iter().enumerate() {
+                let (mut nums_c, mut sub_c) = (nums.to_vec(), sub.to_vec());
+                nums_c.remove(i as usize);
+                sub_c.push(*v);
+                backtrack(&nums_c, &sub_c, res);
+            }
+        }
+        let mut res: Vec<Vec<i32>> = vec![];
+        backtrack(&nums, &vec![], &mut res);
+        res
+    }
+}
