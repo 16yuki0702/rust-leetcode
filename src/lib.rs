@@ -2657,3 +2657,86 @@ impl Solution {
         res
     }
 }
+
+// Multiply Strings
+impl Solution {
+    pub fn multiply(num1: String, num2: String) -> String {
+        let mut res: Vec<u8> = vec![0; num1.len() + num2.len()];
+        let n1: Vec<char> = num1.chars().collect();
+        let n2: Vec<char> = num2.chars().collect();
+        let mut i = num2.len() - 1;
+
+        while i != std::usize::MAX {
+            let mut j = num1.len() - 1;
+            while j != std::usize::MAX {
+                let (v1, v2) = (n1[j] as u8 - '0' as u8, n2[i] as u8 - '0' as u8);
+                let v = (v1 * v2) + res[i + j + 1];
+                res[i + j] = v / 10 + res[i + j];
+                res[i + j + 1] = v - (v / 10) * 10;
+                j -= 1;
+            }
+            i -= 1;
+        }
+
+        let mut idx = num1.len() + num2.len() - 1;
+        let mut i = idx;
+        while i != std::usize::MAX {
+            if res[i as usize] > 0 {
+                idx = i;
+            }
+            res[i as usize] += '0' as u8;
+            i -= 1;
+        }
+
+        std::str::from_utf8(&res[idx..]).unwrap().to_string()
+    }
+}
+
+// Jump Game
+impl Solution {
+    pub fn can_jump(nums: Vec<i32>) -> bool {
+        nums.iter().enumerate().fold(0, |acc, (i, v)| {
+            if acc < i as i32 {
+                return -1;
+            }
+            acc.max(i as i32 + *v)
+        }) >= (nums.len() - 1) as i32
+    }
+}
+
+// Length of Last Word
+impl Solution {
+    pub fn length_of_last_word(s: String) -> i32 {
+        let mut count = 0;
+        let mut re_count = false;
+
+        for c in s.chars() {
+            if c == ' ' {
+                re_count = true;
+            } else {
+                if re_count {
+                    count = 0;
+                    re_count = false;
+                }
+                count += 1;
+            }
+        }
+        count
+    }
+}
+
+// Unique Binary Search Trees
+impl Solution {
+    pub fn num_trees(n: i32) -> i32 {
+        let n = n as usize;
+        let mut dp: Vec<i32> = vec![0; n + 1];
+        dp[0] = 1;
+        dp[1] = 1;
+        for i in 2..=n {
+            for j in 1..=i {
+                dp[i] += dp[j - 1] * dp[i - j];
+            }
+        }
+        dp[n]
+    }
+}
