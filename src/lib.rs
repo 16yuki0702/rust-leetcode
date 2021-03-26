@@ -2740,3 +2740,69 @@ impl Solution {
         dp[n]
     }
 }
+
+// Plus One
+impl Solution {
+    pub fn plus_one(digits: Vec<i32>) -> Vec<i32> {
+        let mut digits = digits;
+        for v in digits.iter_mut().rev() {
+            let sum = *v + 1;
+            *v = sum % 10;
+            if sum < 10 {
+                return digits;
+            }
+        }
+        [&vec![1], &digits[..]].concat()
+    }
+}
+
+// Unique Paths
+impl Solution {
+    pub fn unique_paths(m: i32, n: i32) -> i32 {
+        if m == 0 || n == 0 {
+            return 0;
+        }
+
+        let m: usize = m as usize;
+        let n: usize = n as usize;
+
+        let mut path: Vec<Vec<i32>> = vec![vec![0; n]; m];
+        for i in 0..m {
+            for j in 0..n {
+                if i == 0 || j == 0 {
+                    path[i][j] = 1;
+                } else {
+                    path[i][j] = path[i - 1][j] + path[i][j - 1];
+                }
+            }
+        }
+        path[m - 1][n - 1]
+    }
+}
+
+// Unique Paths II
+impl Solution {
+    pub fn unique_paths_with_obstacles(obstacle_grid: Vec<Vec<i32>>) -> i32 {
+        let row_len = obstacle_grid.len();
+        let col_len = obstacle_grid[0].len();
+        let mut dp = vec![vec![0; col_len]; row_len];
+        for i in 0..row_len {
+            for j in 0..col_len {
+                if obstacle_grid[i][j] == 1 {
+                    dp[i][j] = 0;
+                    continue;
+                }
+                if i == 0 && j == 0 {
+                    dp[i][j] = 1;
+                } else if i == 0 {
+                    dp[i][j] = dp[i][j - 1];
+                } else if j == 0 {
+                    dp[i][j] = dp[i - 1][j];
+                } else {
+                    dp[i][j] = dp[i - 1][j] + dp[i][j - 1];
+                }
+            }
+        }
+        dp[row_len - 1][col_len - 1]
+    }
+}
