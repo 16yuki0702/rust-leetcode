@@ -2806,3 +2806,19 @@ impl Solution {
         dp[row_len - 1][col_len - 1]
     }
 }
+
+// Climbing Stairs
+impl Solution {
+    pub fn climb_stairs(n: i32) -> i32 {
+        if n < 3 {
+            return n;
+        }
+        let (mut p1, mut p2, mut res) = (1, 2, 0);
+        for i in 2..n {
+            res = p1 + p2;
+            p1 = p2;
+            p2 = res;
+        }
+        res
+    }
+}
