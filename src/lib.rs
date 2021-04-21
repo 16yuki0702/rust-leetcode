@@ -2822,3 +2822,124 @@ impl Solution {
         res
     }
 }
+
+// Minimum Path Sum
+impl Solution {
+    pub fn min_path_sum(grid: Vec<Vec<i32>>) -> i32 {
+        let (r_len, c_len) = (grid.len(), grid[0].len());
+        let mut dp = vec![vec![0; c_len]; r_len];
+        for i in 0..r_len {
+            for j in 0..c_len {
+                if i == 0 && j == 0 {
+                    dp[i][j] = grid[i][j];
+                } else if i == 0 {
+                    dp[i][j] = grid[i][j] + dp[i][j - 1];
+                } else if j == 0 {
+                    dp[i][j] = grid[i][j] + dp[i - 1][j];
+                } else {
+                    if dp[i - 1][j] > dp[i][j - 1] {
+                        dp[i][j] = grid[i][j] + dp[i][j - 1];
+                    } else {
+                        dp[i][j] = grid[i][j] + dp[i - 1][j];
+                    }
+                }
+            }
+        }
+        dp[r_len - 1][c_len - 1]
+    }
+}
+
+// Spiral Matrix
+impl Solution {
+    pub fn spiral_order(matrix: Vec<Vec<i32>>) -> Vec<i32> {
+        let (mut top, mut bottom, mut left, mut right) =
+            (0, matrix.len() - 1, 0, matrix[0].len() - 1);
+        let mut res = vec![];
+
+        while top <= bottom && left <= right {
+            for i in left..=right {
+                res.push(matrix[top][i]);
+            }
+            top += 1;
+
+            for i in top..=bottom {
+                res.push(matrix[i][right]);
+            }
+
+            if let None = right.checked_sub(1) {
+                break;
+            }
+            right -= 1;
+
+            for i in (left..=right).rev() {
+                if top > bottom {
+                    continue;
+                }
+                res.push(matrix[bottom][i]);
+            }
+
+            if let None = bottom.checked_sub(1) {
+                break;
+            }
+            bottom -= 1;
+
+            for i in (top..=bottom).rev() {
+                if left > right {
+                    continue;
+                }
+                res.push(matrix[i][left]);
+            }
+            left += 1;
+        }
+        res
+    }
+}
+
+// Spiral Matrix II
+impl Solution {
+    pub fn generate_matrix(n: i32) -> Vec<Vec<i32>> {
+        let n = n as usize;
+        let mut res = vec![vec![0; n]; n];
+        let mut count = 0;
+        let (mut top, mut bottom, mut left, mut right) = (0, n - 1, 0, n - 1);
+
+        while top <= bottom && left <= right {
+            for i in left..=right {
+                count += 1;
+                res[top][i] = count;
+            }
+            top += 1;
+
+            for i in top..=bottom {
+                count += 1;
+                res[i][right] = count;
+            }
+            right -= 1;
+            if right == std::usize::MAX {
+                break;
+            }
+
+            for i in (left..=right).rev() {
+                if top > bottom {
+                    continue;
+                }
+                count += 1;
+                res[bottom][i] = count;
+            }
+            bottom -= 1;
+            if bottom == std::usize::MAX {
+                break;
+            }
+
+            for i in (top..=bottom).rev() {
+                if left > right {
+                    continue;
+                }
+                count += 1;
+                res[i][left] = count;
+            }
+            left += 1;
+        }
+        res
+    }
+}
