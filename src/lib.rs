@@ -2943,3 +2943,46 @@ impl Solution {
         res
     }
 }
+
+// Subsets II
+impl Solution {
+    pub fn subsets_with_dup(nums: Vec<i32>) -> Vec<Vec<i32>> {
+        fn q_sort(n: &mut [i32]) {
+            if n.len() <= 1 {
+                return;
+            }
+            let (mut left, right, mid) = (0, n.len() - 1, n.len() / 2);
+            n.swap(mid, right);
+            for i in 0..n.len() {
+                if n[i] < n[right] {
+                    n.swap(i, left);
+                    left += 1;
+                }
+            }
+            n.swap(left, right);
+            q_sort(&mut n[..left]);
+            q_sort(&mut n[left + 1..]);
+        }
+
+        fn backtrack(nums: &[i32], current: &mut Vec<i32>, res: &mut Vec<Vec<i32>>) {
+            res.push(current.clone());
+
+            let mut i = 0;
+            while i < nums.len() {
+                current.push(nums[i]);
+                backtrack(&nums[i + 1..], current, res);
+                current.remove(current.len() - 1);
+                i += 1;
+                while i < nums.len() && nums[i] == nums[i - 1] {
+                    i += 1;
+                }
+            }
+        }
+
+        let mut res: Vec<Vec<i32>> = vec![];
+        let mut nums = nums;
+        q_sort(&mut nums);
+        backtrack(&nums, &mut vec![], &mut res);
+        res
+    }
+}
