@@ -2986,3 +2986,121 @@ impl Solution {
         res
     }
 }
+
+// Sort Colors
+impl Solution {
+    pub fn sort_colors(nums: &mut Vec<i32>) {
+        let (mut left, mut right, mut current) = (0, nums.len() - 1, 0);
+        while current <= right && 0 < right {
+            match nums[current] {
+                0 => {
+                    nums.swap(left, current);
+                    current += 1;
+                    left += 1;
+                }
+                1 => {
+                    current += 1;
+                }
+                _ => {
+                    nums.swap(current, right);
+                    right -= 1;
+                }
+            }
+        }
+    }
+}
+
+// Sqrt(x)
+impl Solution {
+    pub fn my_sqrt(x: i32) -> i32 {
+        if x <= 1 {
+            return x;
+        }
+        let mut res = x / 2;
+        loop {
+            let tmp = (res + x / res) / 2;
+            if tmp >= res {
+                return res;
+            }
+            res = tmp;
+        }
+    }
+}
+
+// Definition for singly-linked list.
+// #[derive(PartialEq, Eq, Clone, Debug)]
+// pub struct ListNode {
+//   pub val: i32,
+//   pub next: Option<Box<ListNode>>
+// }
+//
+// impl ListNode {
+//   #[inline]
+//   fn new(val: i32) -> Self {
+//     ListNode {
+//       next: None,
+//       val
+//     }
+//   }
+// }
+// Remove Duplicates from Sorted List
+impl Solution {
+    pub fn delete_duplicates(head: Option<Box<ListNode>>) -> Option<Box<ListNode>> {
+        if head.is_none() {
+            return None;
+        }
+        let mut head = head;
+        let mut c = head.as_mut().unwrap();
+        while let Some(n) = c.next.as_mut() {
+            if c.val == n.val {
+                c.next = n.next.take();
+            } else {
+                c = c.next.as_mut().unwrap();
+            }
+        }
+        head
+    }
+}
+
+// Definition for a binary tree node.
+// #[derive(Debug, PartialEq, Eq)]
+// pub struct TreeNode {
+//   pub val: i32,
+//   pub left: Option<Rc<RefCell<TreeNode>>>,
+//   pub right: Option<Rc<RefCell<TreeNode>>>,
+// }
+//
+// impl TreeNode {
+//   #[inline]
+//   pub fn new(val: i32) -> Self {
+//     TreeNode {
+//       val,
+//       left: None,
+//       right: None
+//     }
+//   }
+// }
+// Symmetric Tree
+use std::cell::RefCell;
+use std::rc::Rc;
+impl Solution {
+    pub fn is_symmetric(root: Option<Rc<RefCell<TreeNode>>>) -> bool {
+        fn compare(l: Option<Rc<RefCell<TreeNode>>>, r: Option<Rc<RefCell<TreeNode>>>) -> bool {
+            match (l, r) {
+                (None, None) => true,
+                (None, Some(n)) | (Some(n), None) => false,
+                (Some(l), Some(r)) => {
+                    if l.borrow().val != r.borrow().val {
+                        return false;
+                    }
+                    return compare(l.borrow().left.clone(), r.borrow().right.clone())
+                        && compare(l.borrow().right.clone(), r.borrow().left.clone());
+                }
+            }
+        }
+        match root {
+            Some(r) => compare(r.borrow().left.clone(), r.borrow().right.clone()),
+            None => true,
+        }
+    }
+}
